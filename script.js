@@ -99,11 +99,16 @@ const insertLyricsIntoPage = ({ artist, songTitle, lyrics }) => {
 const fetchLyrics = async (artist, songTitle) => {
 	try {
 		insertWarningMessageIntoPage("Carregando...");
+		const regexpBr = new RegExp(/(<br><br><br><br>|<br><br><br>)/g);
 		const data = await fetchData(`${apiURL}/v1/${artist}/${songTitle}`);
 		let lyrics = data.lyrics.replace(/(\r\n|\r|\n)/g, "<br>");
-			lyrics = lyrics.replace(/(<br><br><br><br>|<br><br><br>)/g, "<br>");
+		lyrics = lyrics.replace(regexpBr, "<br>");
+		const hasBr = regexpBr.test(lyrics);
+		if (hasBr) lyrics = lyrics.replace(regexpBr, "<br>");
+
 		insertLyricsIntoPage({ artist, songTitle, lyrics });
 	} catch (error) {
+		console.log(error);
 		insertWarningMessageIntoPage("Letra não encontrada! ");
 	}
 };
